@@ -24,6 +24,7 @@ services:
       - DB_CONNECTION_TIMEOUT
       - DB_MAX_USES
       - JWT_HOST
+      - SERVICE_GOOGLE_API
     networks:
       app-net: {}
 

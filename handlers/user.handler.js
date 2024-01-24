@@ -155,18 +155,14 @@ export async function findUserByEmailHandler(req, res) {
 export async function loginWithGmailHandler(req, res) {
     try {
         const gmail_user = await getUserGmailProfile(req.headers.authorization.split(' ')[1])
-
-        let user = await findUserByEmailAndPassword(this.db_pool, { email: gmail_user.email, password: gmail_user.id })
-
+        let user = await findUserByEmailAndPassword(this.db_pool, { user_email: gmail_user.email, user_password: gmail_user.id })
         if (!user)
             user = await createUser(this.db_pool, {
                 user_email: gmail_user.email,
                 user_name: gmail_user.email.split('@')[0],
                 user_password: gmail_user.id
             })
-
         const token_response = await this.createToken(user)
-
         return res.code(200).send({
             status_code: 200,
             message: 'Login by gmail is succeed',
