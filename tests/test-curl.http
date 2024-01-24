@@ -1,0 +1,29 @@
+@host=http://localhost:4000
+
+curl {{host}}/healthcheck
+
+###
+curl -X POST \
+     -H 'Content-Type: application/json' \
+     -d '{ \
+        "user_email" : "wildananugrah@gmail.com", \
+        "user_password" : "password", \
+        "user_confirm_password" : "password" \
+        }' \
+    {{host}}/api/users/register
+
+###
+# @name Login
+curl -X POST \
+    -H 'Content-Type: application/json' \
+     -d '{ \
+        "user_email" : "wildananugrah@gmail.com", \
+        "user_password" : "password" \
+        }' \
+    {{host}}/api/users/login
+
+###
+@userId = {{Login.response.body.content.user_id}}
+
+### 
+curl {{host}}/api/users/{{userId}}

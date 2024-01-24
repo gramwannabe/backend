@@ -1,0 +1,9 @@
+@host=http://localhost:4400
+
+POST {{host}}/token
+Content-Type: application/json
+
+{
+    "username" : "wildananugrah",
+    "age" : 32
+}

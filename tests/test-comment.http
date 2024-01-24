@@ -1,0 +1,109 @@
+@host=http://localhost:4000
+
+# @name HealthCheck
+GET {{host}}/healthcheck
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 40
+# Date: Sun, 21 Jan 2024 04:44:12 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "app": true,
+#   "db": true
+# }
+
+###
+# @name Login
+POST {{host}}/api/users/login
+Content-Type: application/json
+
+{
+    "user_email" : "wildananugrah@gmail.com",
+    "user_password" : "password"
+}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 874
+# Date: Sun, 21 Jan 2024 04:44:29 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "User logged succeed",
+#   "content": {
+#     "jwt": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjNlYmFmMTYtNGE4ZS00MDUxLTkzMDEtNDA0NGZlNTYwZWFhIiwidXNlcl9lbWFpbCI6IndpbGRhbmFudWdyYWhAZ21haWwuY29tIiwidXNlcl9wYXNzd29yZCI6InBhc3N3b3JkIiwiY3JlYXRlZF9hdCI6IjIwMjQtMDEtMTdUMTE6MDM6MzAuMjE2WiIsInVwZGF0ZWRfYXQiOm51bGwsImlhdCI6MTcwNTgxMjI2OSwiZXhwIjoxNzA1ODE1ODY5fQ.eiNEnZvBt9TS_hFI10f2iD__ANpqjKulsvTqgnawtBSjI9JaYegFGngNM2MX2GUvj0-zt6S_9PMzqOqZ6G44aDdXFvCkW7dZt3Eoh_-ne3sMUz1HoXJO_IdJ-HLa7B90XAHpflQhBR79aSBUKiQzh8yuS6bHvHTJPadpEaLEDptdODZcpZ2NUNkqQolbSL_KbVa0QByGXp8bPFXGduILHLSdnwxjtVNzCQNq2qZu8gBkNr2sr0WHRw7B40vy8Hyh-Rp5ofUQZziiFJCE7rJE9G6Pt_Md1EO2WYUuSiPy5ctPEjaXfpipx6T1BxIVx9jlLTGIoa0QStolM2IVgltM4g",
+#     "user_id": "63ebaf16-4a8e-4051-9301-4044fe560eaa",
+#     "user_email": "wildananugrah@gmail.com",
+#     "created_at": "2024-01-17T11:03:30.216Z",
+#     "updated_at": ""
+#   }
+# }
+
+###
+@userId = {{Login.response.body.content.user_id}}
+@jwt = {{Login.response.body.content.jwt}}
+
+###
+# @name GetPosts
+GET {{host}}/api/posts?page=1
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 374
+# Date: Sun, 21 Jan 2024 04:44:52 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "Post has been retrieved successfully",
+#   "content": {
+#     "posts": [
+#       {
+#         "post_id": "55876d68-a9bd-4c00-9214-27743350504f",
+#         "post_description": "",
+#         "post_media": [
+#           "/video/uuid-filaname-1.mp4",
+#           "/video/uuid-filaname-2.mp4"
+#         ],
+#         "post_media_type": "collection",
+#         "user_id": "63ebaf16-4a8e-4051-9301-4044fe560eaa",
+#         "created_at": "2024-01-21T04:44:42.274Z",
+#         "updated_at": null
+#       }
+#     ]
+#   }
+# }
+
+###
+@postId = {{GetPosts.response.body.content.posts[0].post_id}}
+
+###
+# @name GetComments
+GET {{host}}/api/comments/{{postId}}
+
+###
+@commentId = {{GetComments.response.body.content.comments[0].comment_id}}
+
+###
+POST {{host}}/api/comments/{{postId}}
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+    "comment" : "this is my first comment"
+}
+
+###
+DELETE {{host}}/api/comments/{{commentId}}

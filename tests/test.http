@@ -1,0 +1,412 @@
+@host=http://localhost:4000
+
+# @name HealthCheck
+GET {{host}}/healthcheck
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 40
+# Date: Sun, 21 Jan 2024 04:44:12 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "app": true,
+#   "db": true
+# }
+
+
+###
+# @name Register
+POST {{host}}/api/users/register
+Content-Type: application/json
+
+{
+    "user_email" : "wildananugrah-2@gmail.com",
+    "user_password" : "password",
+    "user_confirm_password" : "password"
+}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 119
+# Date: Sun, 21 Jan 2024 04:44:21 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "User has been created successfully",
+#   "content": {
+#     "user_email": "wildananugrah-2@gmail.com"
+#   }
+# }
+
+
+###
+# @name Login
+POST {{host}}/api/users/login
+Content-Type: application/json
+
+{
+    "user_email" : "wildananugrah@gmail.com",
+    "user_password" : "password"
+}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 874
+# Date: Sun, 21 Jan 2024 04:44:29 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "User logged succeed",
+#   "content": {
+#     "jwt": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjNlYmFmMTYtNGE4ZS00MDUxLTkzMDEtNDA0NGZlNTYwZWFhIiwidXNlcl9lbWFpbCI6IndpbGRhbmFudWdyYWhAZ21haWwuY29tIiwidXNlcl9wYXNzd29yZCI6InBhc3N3b3JkIiwiY3JlYXRlZF9hdCI6IjIwMjQtMDEtMTdUMTE6MDM6MzAuMjE2WiIsInVwZGF0ZWRfYXQiOm51bGwsImlhdCI6MTcwNTgxMjI2OSwiZXhwIjoxNzA1ODE1ODY5fQ.eiNEnZvBt9TS_hFI10f2iD__ANpqjKulsvTqgnawtBSjI9JaYegFGngNM2MX2GUvj0-zt6S_9PMzqOqZ6G44aDdXFvCkW7dZt3Eoh_-ne3sMUz1HoXJO_IdJ-HLa7B90XAHpflQhBR79aSBUKiQzh8yuS6bHvHTJPadpEaLEDptdODZcpZ2NUNkqQolbSL_KbVa0QByGXp8bPFXGduILHLSdnwxjtVNzCQNq2qZu8gBkNr2sr0WHRw7B40vy8Hyh-Rp5ofUQZziiFJCE7rJE9G6Pt_Md1EO2WYUuSiPy5ctPEjaXfpipx6T1BxIVx9jlLTGIoa0QStolM2IVgltM4g",
+#     "user_id": "63ebaf16-4a8e-4051-9301-4044fe560eaa",
+#     "user_email": "wildananugrah@gmail.com",
+#     "created_at": "2024-01-17T11:03:30.216Z",
+#     "updated_at": ""
+#   }
+# }
+
+
+###
+@userId = {{Login.response.body.content.user_id}}
+@jwt = {{Login.response.body.content.jwt}}
+
+###
+### post_media_type = collection | video | image
+# @name Post
+POST {{host}}/api/posts
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+    "post_media" : [
+        "/video/uuid-filaname-1.mp4",
+        "/video/uuid-filaname-2.mp4"
+    ],
+    "post_media_type" : "collection"
+}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 122
+# Date: Sun, 21 Jan 2024 04:44:42 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "Post has been created successfully",
+#   "content": {
+#     "id": "55876d68-a9bd-4c00-9214-27743350504f"
+#   }
+# }
+
+
+###
+@postId = {{Post.response.body.content.id}}
+
+###
+GET {{host}}/api/posts?page=1
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 374
+# Date: Sun, 21 Jan 2024 04:44:52 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "Post has been retrieved successfully",
+#   "content": {
+#     "posts": [
+#       {
+#         "post_id": "55876d68-a9bd-4c00-9214-27743350504f",
+#         "post_description": "",
+#         "post_media": [
+#           "/video/uuid-filaname-1.mp4",
+#           "/video/uuid-filaname-2.mp4"
+#         ],
+#         "post_media_type": "collection",
+#         "user_id": "63ebaf16-4a8e-4051-9301-4044fe560eaa",
+#         "created_at": "2024-01-21T04:44:42.274Z",
+#         "updated_at": null
+#       }
+#     ]
+#   }
+# }
+
+
+###
+GET {{host}}/api/posts/{{postId}}
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 371
+# Date: Sun, 21 Jan 2024 04:45:00 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "Post has been retrieved successfully",
+#   "content": {
+#     "post": {
+#       "post_id": "55876d68-a9bd-4c00-9214-27743350504f",
+#       "post_description": "",
+#       "post_media": [
+#         "/video/uuid-filaname-1.mp4",
+#         "/video/uuid-filaname-2.mp4"
+#       ],
+#       "post_media_type": "collection",
+#       "user_id": "63ebaf16-4a8e-4051-9301-4044fe560eaa",
+#       "created_at": "2024-01-21T04:44:42.274Z",
+#       "updated_at": null
+#     }
+#   }
+# }
+
+
+###
+PUT {{host}}/api/posts/{{postId}}
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+    "post_description" : "this is my post description"
+}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 396
+# Date: Sun, 21 Jan 2024 04:45:06 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "Post has been updated successfully",
+#   "content": {
+#     "post": {
+#       "post_id": "55876d68-a9bd-4c00-9214-27743350504f",
+#       "post_description": "this is my post description",
+#       "post_media": [
+#         "/video/uuid-filaname-1.mp4",
+#         "/video/uuid-filaname-2.mp4"
+#       ],
+#       "post_media_type": "collection",
+#       "user_id": "63ebaf16-4a8e-4051-9301-4044fe560eaa",
+#       "created_at": "2024-01-21T04:44:42.274Z",
+#       "updated_at": null
+#     }
+#   }
+# }
+
+
+###
+DELETE {{host}}/api/posts/{{postId}}
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 127
+# Date: Sun, 21 Jan 2024 04:45:17 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "Post has been deleted successfully",
+#   "content": {
+#     "post_id": "55876d68-a9bd-4c00-9214-27743350504f"
+#   }
+# }
+
+###
+GET {{host}}/api/users/profile/me
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 495
+# Date: Mon, 22 Jan 2024 02:05:52 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "User Profile has been retrieved successfully",
+#   "content": {
+#     "user": {
+#       "user_id": "4eba1e16-2bfc-4874-8f16-a5b120698b9b",
+#       "user_name": "wildananugrah",
+#       "user_email": "wildananugrah@gmail.com",
+#       "user_password": "password",
+#       "user_profile_picture": null,
+#       "user_fullname": "Wildan Anugrah",
+#       "user_bio_profile": "Hello, feel free to chat we meet!",
+#       "user_post_number": null,
+#       "user_follower_number": null,
+#       "user_following_number": null,
+#       "created_at": "2024-01-21T14:26:05.118Z",
+#       "updated_at": null
+#     }
+#   }
+# }
+
+
+###
+PUT {{host}}/api/users/profile
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+    "user_fullname": "Wildan Anugrah",
+    "user_bio_profile" : "Hello, feel free to chat we meet!"
+}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 493
+# Date: Mon, 22 Jan 2024 01:49:53 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "User Profile has been updated successfully",
+#   "content": {
+#     "user": {
+#       "user_id": "4eba1e16-2bfc-4874-8f16-a5b120698b9b",
+#       "user_name": "wildananugrah",
+#       "user_email": "wildananugrah@gmail.com",
+#       "user_password": "password",
+#       "user_profile_picture": null,
+#       "user_fullname": "Wildan Anugrah",
+#       "user_bio_profile": "Hello, feel free to chat we meet!",
+#       "user_post_number": null,
+#       "user_follower_number": null,
+#       "user_following_number": null,
+#       "created_at": "2024-01-21T14:26:05.118Z",
+#       "updated_at": null
+#     }
+#   }
+# }
+
+### 
+PUT {{host}}/api/users/profile/picture
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+    "user_profile_picture": "URIPIC"
+}
+
+###
+GET {{host}}/api/posts/me
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+# HTTP/1.1 200 OK
+# vary: Origin
+# access-control-allow-origin: *
+# content-type: application/json; charset=utf-8
+# content-length: 2016
+# Date: Mon, 22 Jan 2024 03:52:11 GMT
+# Connection: close
+
+# {
+#   "status_code": 200,
+#   "message": "Post has been retrieved successfully",
+#   "content": {
+#     "posts": [
+#       {
+#         "post_id": "7910b8e2-77ce-4c8f-9831-aa0c9925da97",
+#         "post_name": "",
+#         "post_description": "Hello, world!",
+#         "post_media": [
+#           "a94bf71e-11ac-40ec-a094-d4e4d608829f-test1.mp4"
+#         ],
+#         "post_media_type": "video",
+#         "user_id": "4eba1e16-2bfc-4874-8f16-a5b120698b9b",
+#         "created_at": "2024-01-21T14:26:05.118Z",
+#         "updated_at": null,
+#         "user_name": "wildananugrah",
+#         "user_email": "wildananugrah@gmail.com",
+#         "user_password": "password",
+#         "user_profile_picture": "3485344f-da3e-465f-a5aa-76ce03cdc367-YjPYp-WU_400x400.jpg",
+#         "user_fullname": "Wildan Anugrah",
+#         "user_bio_profile": "Hello, feel free to chat we meet!",
+#         "user_post_number": null,
+#         "user_follower_number": null,
+#         "user_following_number": null
+#       },
+#       {
+#         "post_id": "9ffe6f85-217e-4747-a719-da36833c9c1d",
+#         "post_name": "",
+#         "post_description": "good video",
+#         "post_media": [
+#           "cf7e5ac2-3613-4f25-916b-6be9a6a82c71-video.mov"
+#         ],
+#         "post_media_type": "video",
+#         "user_id": "4eba1e16-2bfc-4874-8f16-a5b120698b9b",
+#         "created_at": "2024-01-21T14:26:05.118Z",
+#         "updated_at": null,
+#         "user_name": "wildananugrah",
+#         "user_email": "wildananugrah@gmail.com",
+#         "user_password": "password",
+#         "user_profile_picture": "3485344f-da3e-465f-a5aa-76ce03cdc367-YjPYp-WU_400x400.jpg",
+#         "user_fullname": "Wildan Anugrah",
+#         "user_bio_profile": "Hello, feel free to chat we meet!",
+#         "user_post_number": null,
+#         "user_follower_number": null,
+#         "user_following_number": null
+#       },
+#       {
+#         "post_id": "724a89c5-5a60-4504-ab2f-4626e9e9133a",
+#         "post_name": "",
+#         "post_description": "good video",
+#         "post_media": [
+#           "67353810-b25c-49e3-86e4-db1e7fad80f0-test1.mp4"
+#         ],
+#         "post_media_type": "video",
+#         "user_id": "4eba1e16-2bfc-4874-8f16-a5b120698b9b",
+#         "created_at": "2024-01-21T14:26:05.118Z",
+#         "updated_at": null,
+#         "user_name": "wildananugrah",
+#         "user_email": "wildananugrah@gmail.com",
+#         "user_password": "password",
+#         "user_profile_picture": "3485344f-da3e-465f-a5aa-76ce03cdc367-YjPYp-WU_400x400.jpg",
+#         "user_fullname": "Wildan Anugrah",
+#         "user_bio_profile": "Hello, feel free to chat we meet!",
+#         "user_post_number": null,
+#         "user_follower_number": null,
+#         "user_following_number": null
+#       }
+#     ]
+#   }
+# }
+

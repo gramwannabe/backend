@@ -1,0 +1,52 @@
+version: "3.1"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./app.Dockerfile
+    container_name: backend
+    restart: always
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    environment:
+      - APP_ENV
+      - APP_HOST
+      - APP_PORT
+      - DB_HOST
+      - DB_DATABASE
+      - DB_PORT
+      - DB_USER
+      - DB_PASS
+      - DB_POOL_MIN
+      - DB_POOL_MAX
+      - DB_IDLE_TIMEOUT
+      - DB_CONNECTION_TIMEOUT
+      - DB_MAX_USES
+      - JWT_HOST
+    networks:
+      app-net: {}
+
+  # baseline-pg-db:
+  #   image: postgres:alpine
+  #   container_name: baseline-pg-db
+  #   ports:
+  #     - "6000:5432"
+  #   environment:
+  #     - PGDATA=/var/lib/postgresql/data/pgdata
+  #     - POSTGRES_USER
+  #     - POSTGRES_PASSWORD
+  #   volumes:
+  #     - ./data-db:/var/lib/postgresql/data
+  #   networks:
+  #     app-net: {}
+  #   restart: unless-stopped
+
+networks:
+  app-net:
+    external: true
+    name: "gramwannabe-net"
+
+# volumes:
+#   data-diudara:
+#     driver: local
