@@ -3,7 +3,6 @@ import AppError from "../helpers/common.exception.js";
 
 export async function getUserGmailProfile(gmailToken) {
     try {
-        console.log(`gmailToken: ${gmailToken}`)
         const response = await fetch(`${serviceGoogleApi}/oauth2/v1/userinfo?alt=json`, {
             headers: {
                 "Authorization": `Bearer ${gmailToken}`
